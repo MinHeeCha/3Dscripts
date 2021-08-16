@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    public GameManager gameManager;
+
     public float maxSpeed;
     public float jumpPower;
 
@@ -25,7 +27,7 @@ public class PlayerMove : MonoBehaviour
             rigid.velocity = new Vector2(rigid.velocity.normalized.x * 0.5f, rigid.velocity.y);
 
         // Direction animation
-        if (Input.GetButtonDown("Horizontal"))
+        if (Input.GetButton("Horizontal"))
             spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;
 
         // Walking animation
@@ -75,8 +77,60 @@ public class PlayerMove : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            OnDamaged(collision.transform.position);
+            // Attack
+            if (rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
+                OnAttack(collision.transform);
+            }
+            else    // Damaged
+            {
+                OnDamaged(collision.transform.position);
+            }
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Item")
+        {
+            Debug.Log("dd");
+
+            // Point
+            bool isBronze = collision.gameObject.name.Contains("Bronze");
+            bool isSilver = collision.gameObject.name.Contains("Silver");
+            bool isGold = collision.gameObject.name.Contains("Gold");
+
+            if (isBronze)
+                gameManager.stagePoint += 50;
+            else if (isSilver)
+                gameManager.stagePoint += 100;
+            else if (isGold)
+                gameManager.stagePoint += 300;
+
+            // Deactive Item
+            collision.gameObject.SetActive(false);
+        }
+        else if (collision.gameObject.tag == "Finish")
+        {
+            // Next stage
+
+        }
+    }
+
+    void OnAttack(Transform enemy)
+    {
+        // Point
+        gameManager.stagePoint += 100;
+
+        // Reaction force
+        rigid.AddForce(Vector2.up * 10, ForceMode2D.Impulse);
+
+        // Enemy Die
+        EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
+
+        // 내가 임의로
+        if (enemy.gameObject.name.Contains("Enemy"))
+            enemyMove.OnDamaged();
     }
 
     void OnDamaged(Vector2 targetPos)
