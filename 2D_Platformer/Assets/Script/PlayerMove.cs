@@ -12,12 +12,14 @@ public class PlayerMove : MonoBehaviour
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
+    CapsuleCollider2D colider;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        colider = GetComponent<CapsuleCollider2D>();
     }
 
     private void Update()
@@ -93,8 +95,6 @@ public class PlayerMove : MonoBehaviour
     {
         if (collision.gameObject.tag == "Item")
         {
-            Debug.Log("dd");
-
             // Point
             bool isBronze = collision.gameObject.name.Contains("Bronze");
             bool isSilver = collision.gameObject.name.Contains("Silver");
@@ -113,7 +113,7 @@ public class PlayerMove : MonoBehaviour
         else if (collision.gameObject.tag == "Finish")
         {
             // Next stage
-
+            gameManager.NextStage();
         }
     }
 
@@ -135,6 +135,9 @@ public class PlayerMove : MonoBehaviour
 
     void OnDamaged(Vector2 targetPos)
     {
+        // Health down
+        gameManager.HealthDown();
+
         // Change layer
         gameObject.layer = 11;
 
@@ -154,5 +157,25 @@ public class PlayerMove : MonoBehaviour
     {
         gameObject.layer = 10;
         spriteRenderer.color = new Color(1, 1, 1, 1);
+    }
+
+    public void OnDie()
+    {
+        // Sprite Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        // Sprite Flip Y
+        spriteRenderer.flipY = true;
+
+        // Collider disable
+        colider.enabled = false;
+
+        // Die effect jump
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+    }
+
+    public void VelocityZero()
+    {
+        rigid.velocity = Vector2.zero;
     }
 }
