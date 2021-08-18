@@ -28,7 +28,7 @@ public class EnemyMove : MonoBehaviour
 
         // Platform check
         Vector2 frontVec = new Vector2(rigid.position.x + nextMove * 0.4f, rigid.position.y);
-        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
+        //Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
         RaycastHit2D raytHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Platform"));
 
         if (raytHit.collider == null)
@@ -40,7 +40,7 @@ public class EnemyMove : MonoBehaviour
     // Recursive function
     void Think()
     {
-        // Set next active
+        // Set next active : -1 ~ 1
         nextMove = Random.Range(-1, 2);
 
         // Sprite animation

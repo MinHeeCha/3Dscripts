@@ -74,16 +74,11 @@ public class PlayerMove : MonoBehaviour
         // Landing platform
         if (rigid.velocity.y < 0)
         {
-            Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
+            //Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
             RaycastHit2D raytHit = Physics2D.Raycast(rigid.position + (spriteRenderer.flipX ? Vector2.left : Vector2.right), Vector3.down, 1, LayerMask.GetMask("Platform"));
 
-            if (raytHit.collider != null)
-            {
-                if (raytHit.distance < 0.5f)
-                {
-                    anim.SetBool("isJumping", false);
-                }
-            }
+            if (raytHit.collider != null && raytHit.distance < 0.5f)
+                anim.SetBool("isJumping", false);
         }
     }
 
@@ -93,19 +88,9 @@ public class PlayerMove : MonoBehaviour
         {
             // Attack
             if (rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
-            {
                 OnAttack(collision.transform);
-
-                // Sound
-                PlaySound("ATTACK");
-            }
             else    // Damaged
-            {
                 OnDamaged(collision.transform.position);
-
-                // Sound
-                PlaySound("DAMAGED");
-            }
         }
     }
 
@@ -155,6 +140,9 @@ public class PlayerMove : MonoBehaviour
         // 내가 임의로
         if (enemy.gameObject.name.Contains("Enemy"))
             enemyMove.OnDamaged();
+
+        // Sound
+        PlaySound("ATTACK");
     }
 
     void OnDamaged(Vector2 targetPos)
@@ -175,11 +163,17 @@ public class PlayerMove : MonoBehaviour
         // Animation
         anim.SetTrigger("isDamaged");
         Invoke("OffDamaged", 3f);
+
+        // Sound
+        PlaySound("DAMAGED");
     }
 
     void OffDamaged()
     {
+        // Change layer
         gameObject.layer = 10;
+
+        // View alpha
         spriteRenderer.color = new Color(1, 1, 1, 1);
     }
 
